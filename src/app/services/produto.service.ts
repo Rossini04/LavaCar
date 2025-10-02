@@ -23,6 +23,10 @@ export class ProdutoService {
   deleteProduto(id: number) {
     return this.dbService.produtos.delete(id);
   }
+  getProdutosByFornecedorId(fornecedorId: number): Promise<Produto[]> {
+    return this.dbService.produtos.where('fornecedorId')
+      .equals(fornecedorId).toArray();
+  }
 
 }
 
