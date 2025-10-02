@@ -25,7 +25,7 @@ export class ProdutoService {
   }
   getProdutosByFornecedorId(fornecedorId: number): Promise<Produto[]> {
     return this.dbService.produtos.where('fornecedorId')
-      .equals(fornecedorId).toArray();
+                                        .equals(fornecedorId).toArray();
   }
 
 }

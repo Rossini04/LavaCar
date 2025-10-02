@@ -2,7 +2,6 @@ import { ActivatedRoute, Route, Router } from '@angular/router';
 import { Produto } from '../../../models/produto.model';
 import { ProdutoService } from '../../../services/produto.service';
 import { Component } from '@angular/core';
-import { FornecedorService } from '../../../services/fornecedor.service';
 
 @Component({
   selector: 'app-listar-produtos-fornecedor',

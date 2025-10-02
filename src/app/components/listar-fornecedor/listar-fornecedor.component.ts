@@ -2,33 +2,77 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FornecedorService } from '../../services/fornecedor.service';
 import Swal from 'sweetalert2';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Fornecedor } from '../../models/fornecedor.model';
 
 @Component({
   selector: 'app-listar-fornecedor',
-  imports: [],
+  imports: [ReactiveFormsModule, FormsModule],
   templateUrl: './listar-fornecedor.component.html',
   styleUrl: './listar-fornecedor.component.css'
-})
+  })
 export class ListarFornecedorComponent implements OnInit {
-produtos: any;
-  viewProdutosFornecedor(arg0: any) {
-    throw new Error('Method not implemented.');
-  }
-  fornecedores: any[] = [];
+  produtos: any;
+  fornecedores: Fornecedor[] = [];
   filtro = new FormControl('');
-  constructor(private fornecedorService: FornecedorService, private router:
-    Router) { }
+  fornecedoresFiltrados: Fornecedor[] = [];
+  fornecedoresPaginados: Fornecedor[] = [];
+  aplicarFiltrosEAtualizarPagina(): void {
+  this.fornecedoresFiltrados = this.getFornecedoresFiltrados();
+      this.paginaAtual = 1;
+      this.atualizarPagina();
+  }
+  paginaAtual = 1;
+  itensPorPagina  = 5;
+  atualizarPagina(): void {
+    const inicio = (this.paginaAtual - 1) * this.itensPorPagina;
+    const fim = inicio + this.itensPorPagina;
+    this.fornecedoresPaginados = this.fornecedoresFiltrados.slice(inicio, fim);
+    
+  }
+  irParaPagina(pagina: number): void {
+    if (pagina >= 1 && pagina <= this.totalPages) {
+    this.paginaAtual = pagina;
+    this.atualizarPagina();
+    }
+  }
+  anterior(): void {
+    if (this.paginaAtual > 1) {
+    this.paginaAtual--;
+    this.atualizarPagina();
+    }
+  }
+  proxima(): void {
+    if (this.paginaAtual < this.totalPages) {
+    this.paginaAtual++;
+    this.atualizarPagina();
+    }
+  }
+  get totalPages(): number {
+    return Math.ceil(this.fornecedoresFiltrados.length / this.itensPorPagina);
+  }
+  get paginasArray(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  }
+  constructor(private fornecedorService: FornecedorService, private router: Router) { }
 
-  ngOnInit(): void {
-    this.getAllFornecedores();
+  viewProdutosFornecedor(id: number) {
+    this.router.navigate(['/fornecedor', id, 'produtos']);
+  }
+  async ngOnInit(){
+    this.filtro.valueChanges.subscribe(() =>{
+      this.aplicarFiltrosEAtualizarPagina();
+    });
+    await this.carregarFornecedores();
   }
 
-  getAllFornecedores() {
-    this.fornecedorService.getAllFornecedores().then(fornecedores => {
-      this.fornecedores = fornecedores;
-    });
+  async carregarFornecedores(): Promise<void> {
+    this.fornecedores = await this.getAllFornecedores();
+    this.aplicarFiltrosEAtualizarPagina();
+  }
+
+  async getAllFornecedores(): Promise<Fornecedor[]> {
+    return await this.fornecedorService.getAllFornecedores();
   }
   getFornecedoresFiltrados(): Fornecedor[] {
     const filtro = this.filtro.value?.toLowerCase() || '';
