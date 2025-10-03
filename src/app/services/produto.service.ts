@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DbService } from './db.service';
 import { Produto } from '../models/produto.model';
+import { Servico } from '../models/servico.model';
 
 @Injectable({
   providedIn: 'root'
@@ -27,6 +28,5 @@ export class ProdutoService {
     return this.dbService.produtos.where('fornecedorId')
                                         .equals(fornecedorId).toArray();
   }
-
 }
 
